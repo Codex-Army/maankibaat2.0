@@ -1,73 +1,200 @@
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<title>Modi Product</title>
-<link rel="stylesheet" href="/css/style.css">
-</head>
-<body>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modi Ka Dimag | Mitron Market</title>
+  <link rel="stylesheet" href="/css/style.css">
 
-<div class="container">
-
-<h1>Modi Ka Dimag</h1>
-
-<img src="https://preview.redd.it/einstein-damodar-das-modi-v0-mq86ip3vqltg1.jpeg?width=640&crop=smart&auto=webp&s=d71e6fd3d34e1b3bb88aed97fa8d22042479f136">
-
-<div class="card">
-
-<h2>Price: ₹7 Crore</h2>
-
-<p>Mitron... price thoda zyada nahi ho gaya? 👀</p>
-
-<button onclick="buy()">Buy Now</button>
-
-<div class="result" id="buyResult"></div>
-
-<!-- Hidden meme audio: replay every time Buy Now is pressed. -->
-<audio id="buyNowAudio" preload="auto" playsinline
-  src="https://www.myinstants.com/media/sounds/is-sajjan-ko-kya-takleef-hai-bhai.mp3"></audio>
-
-</div>
-
-</div>
-
-<script>
-
-async function buy(){
-
-    // Play the existing page audio on every Buy Now click (no visible player).
-    const audio = document.getElementById('buyNowAudio');
-    if (audio) {
-        try {
-            audio.currentTime = 0;
-            await audio.play();
-        } catch (e) {
-            // The click itself is a user gesture; retry without blocking the buy request.
-            audio.play().catch(() => {});
-        }
+  <style>
+    body {
+      background: #0b0b0f;
+      color: #f5f5f5;
+      font-family: Arial, sans-serif;
     }
 
-    const res = await fetch('/buy',{
-        method:'POST',
-        headers:{
-            'Content-Type':'application/json'
-        },
-        body:JSON.stringify({
-            product:'Modi Ka Dimag',
-            price:70000000
-        })
+    .container {
+      max-width: 850px;
+      margin: 45px auto;
+      padding: 20px;
+    }
+
+    .product-card {
+      background: #17171e;
+      border: 1px solid #38303a;
+      border-radius: 18px;
+      padding: 25px;
+      box-shadow: 0 0 25px rgba(255, 0, 55, 0.12);
+    }
+
+    .product-image {
+      display: block;
+      width: 100%;
+      max-width: 480px;
+      max-height: 340px;
+      object-fit: cover;
+      border-radius: 14px;
+      margin: 20px auto;
+    }
+
+    .price {
+      color: #ff465e;
+      font-size: 28px;
+      font-weight: bold;
+    }
+
+    .tag {
+      display: inline-block;
+      background: #32151d;
+      color: #ff8291;
+      border: 1px solid #67303c;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+    }
+
+    .message {
+      color: #c9c9d2;
+      min-height: 25px;
+      margin: 15px 0;
+    }
+
+    .buy-btn {
+      background: #e92745;
+      color: white;
+      border: none;
+      padding: 13px 25px;
+      border-radius: 9px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .buy-btn:hover {
+      background: #ff405b;
+      transform: translateY(-1px);
+    }
+
+    .result {
+      margin-top: 18px;
+      overflow-wrap: anywhere;
+    }
+
+    .notice {
+      color: #858592;
+      font-size: 12px;
+      margin-top: 20px;
+    }
+  </style>
+</head>
+
+<body>
+  <main class="container">
+    <span class="tag">MITRON MARKET • PREMIUM COLLECTION</span>
+
+    <h1>🧠 Modi Ka Dimag</h1>
+    <p class="message">
+      Exclusive item, mitron. Stock limited hai... shayad. 👀
+    </p>
+
+    <img
+      class="product-image"
+      src="https://preview.redd.it/einstein-damodar-das-modi-v0-mq86ip3vqltg1.jpeg?width=640&crop=smart&auto=webp&s=d71e6fd3d34e1b3bb88aed97fa8d22042479f136"
+      alt="Modi Ka Dimag product meme"
+    >
+
+    <section class="product-card">
+      <h2>Special Edition: Dimag Pro Max</h2>
+      <p class="price">₹7 Crore</p>
+
+      <p id="priceMessage" class="message" aria-live="polite">
+        Mitron... price thoda zyada nahi ho gaya? 👀
+      </p>
+
+      <button class="buy-btn" id="buyButton" onclick="buy()">
+        🛒 Buy Now
+      </button>
+
+      <div class="result" id="buyResult" aria-live="polite"></div>
+
+      <p class="notice">
+        * Mitron Market is a fictional CTF training environment.
+      </p>
+
+      <audio
+        id="buyNowAudio"
+        preload="auto"
+        playsinline
+        src="https://www.myinstants.com/media/sounds/is-sajjan-ko-kya-takleef-hai-bhai.mp3">
+      </audio>
+    </section>
+  </main>
+
+  <script>
+    const messages = [
+      "Mitron... price thoda zyada nahi ho gaya? 👀",
+      "EMI  ke liye poori zindagi kam pad jayegi! 😂",
+      "UPI limit bhi soch mein pad gayi. 💸",
+      "Itne mein toh poora server khareed lete! 🖥️",
+      "Discount code hai kya, mitron? 🤔",
+      "Bank manager ne call kaat diya. 📵",
+      "Premium item hai, budget ko mat dekho! 😎"
+    ];
+
+    let previousMessage = -1;
+
+    document.getElementById("priceMessage").addEventListener("click", () => {
+      showRandomMessage();
     });
 
-    const data = await res.json();
+    function showRandomMessage() {
+      let next;
+      do {
+        next = Math.floor(Math.random() * messages.length);
+      } while (messages.length > 1 && next === previousMessage);
 
-    if(data.success){
-        document.getElementById('buyResult').innerText = data.flag;
-    }else{
-        document.getElementById('buyResult').innerText = data.message;
+      previousMessage = next;
+      document.getElementById("priceMessage").textContent = messages[next];
     }
-}
 
-</script>
+    async function buy() {
+      const button = document.getElementById("buyButton");
+      const result = document.getElementById("buyResult");
+      const audio = document.getElementById("buyNowAudio");
 
+      // Replay audio on every click.
+      if (audio) {
+        audio.currentTime = 0;
+        audio.play().catch(() => {});
+      }
+
+      showRandomMessage();
+      result.textContent = "Processing your premium order... ⏳";
+      button.disabled = true;
+
+      try {
+        const res = await fetch("/buy", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            product: "Modi Ka Dimag",
+            price: 70000000
+          })
+        });
+
+        const data = await res.json();
+
+        result.textContent = data.success
+          ? "🎉 " + (data.flag || "Order successful!")
+          : (data.message || "Order failed, mitron!");
+
+      } catch (error) {
+        result.textContent = "Server se connection nahi ho paya. Dobara try karo.";
+      } finally {
+        button.disabled = false;
+      }
+    }
+  </script>
 </body>
 </html>
